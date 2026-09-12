@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button'
 
 const EXAMPLES = [
   'Engine se achanak dhuan nikal raha hai aur car ruk gayi',
-  'Dashboard lights flicker kar rahi hain aur gaadi start nahi ho rahi',
-  'Car ke brakes lagane par loud grinding awaz aa rahi hai',
-  'Tyre flat ho gaya highway par, safe kaise rahu?',
+  'Dashboard lights flicker kar rahi hain aur car start nahi ho rahi',
+  'Brakes dabane par loud grinding noise aa rahi hai',
+  'Highway par puncture ho gaya hai, safety steps kya hain?',
 ]
 
 interface Message {
@@ -68,10 +68,9 @@ export function AiDiagnosis() {
       })
 
       const data = await res.json()
-      const replyContent = data.reply || (typeof data === 'string' ? data : null)
 
-      if (!res.ok || !replyContent) {
-        throw new Error(data.error || 'Server error')
+      if (!res.ok || !data.reply) {
+        throw new Error(data.error || 'API failed')
       }
 
       setMessages((prev) => [
@@ -79,14 +78,24 @@ export function AiDiagnosis() {
         {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          text: replyContent,
+          text: data.reply,
         },
       ])
     } catch {
-      // Natural human-like triage fallback
-      const fallbackText = value.match(/[a-zA-Z]/) && !value.toLowerCase().includes('bhai') && !value.toLowerCase().includes('gadi')
-        ? "Please remain calm. Immediately pull over to the safety lane or shoulder, turn on your emergency hazard lights, and stay away from oncoming traffic. Do not attempt to force-drive the vehicle. You can request instant mechanical dispatch or towing from the emergency options below."
-        : "Pareshan mat hoiye, sab theek ho jayega. Sabse pehle gaadi ko highway ke safe left shoulder par laga lijiye aur hazard lights (charo indicators) on kar lijiye. Gadi se bahar nikal kar traffic se safe distance banaye rakhein. Niche diye gaye directory se turant mechanic ya tow service ko call kar sakte hain.";
+      // Natural conversational fallback in case of connection drop
+      const isHindi = /[\u0900-\u097F]|bhai|gadi|dhuan|kya|nahi|raha|madad/i.test(value)
+      const isGreeting = /^(hi|hello|hey|namaste|salaam)/i.test(value.trim())
+
+      let fallbackText = ''
+      if (isGreeting) {
+        fallbackText = isHindi
+          ? "Namaste! Main ResQRoute Assistant hoon. Aapki gaadi me kya pareshani aa rahi hai? Mujhe batayein, main madad karta hoon."
+          : "Hello! I am your ResQRoute roadside assistant. How can I help you with your vehicle today?"
+      } else {
+        fallbackText = isHindi
+          ? "Ghabrayiye mat. Sabse pehle gaadi ko highway ke safe left side (shoulder) par rok lijiye aur hazard lights on kar lijiye. Gaadi ka bonnet abhi mat kholiye. Niche di gayi list se nearest mechanic ya towing ko turant call kar sakte hain."
+          : "Please stay safe. Gently steer your vehicle onto the road shoulder and turn on your emergency hazard flashers. Avoid opening hot components. You can instantly reach nearest emergency mechanics or towing from the directory below."
+      }
 
       setMessages((prev) => [
         ...prev,
@@ -109,7 +118,7 @@ export function AiDiagnosis() {
         </span>
         <div>
           <h3 className="font-display text-base font-bold leading-tight">
-            ResQRoute AI Emergency Assistant
+            ResQRoute Emergency AI Assistant
           </h3>
           <p className="text-xs text-background/70">
             Bilingual • Real-time Safety &amp; Breakdown Guidance
@@ -126,7 +135,7 @@ export function AiDiagnosis() {
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
             <ShieldAlert className="size-8 text-primary" aria-hidden />
             <p className="max-w-xs text-sm text-muted-foreground text-balance">
-              Gaadi me kya issue aa raha hai? Hindi ya English kisi me bhi puchiye:
+              Gaadi me kya pareshani hai? Hindi ya English kisi me bhi puchiye:
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {EXAMPLES.map((ex) => (
