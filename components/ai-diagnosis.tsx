@@ -5,16 +5,16 @@ import { Sparkles, Send, ShieldAlert, LoaderCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const EXAMPLES = [
-  'Engine se achanak dhuan nikal raha hai aur car ruk gayi',
-  'Dashboard lights flicker kar rahi hain aur car start nahi ho rahi',
-  'Brakes dabane par loud grinding noise aa rahi hai',
-  'Highway par puncture ho gaya hai, safety steps kya hain?',
+  'Bhai mai rasta bhatak gayi hu sunsaan jagah par',
+  'Engine se achanak dhuan nikalne laga aur awaz aa rahi hai',
+  'Car start nahi ho rahi, dashboard lights flicker kar rahi hain',
+  'My steering wheel is shaking violently, what should I do?',
 ]
 
 interface Message {
   id: string
   role: 'user' | 'assistant'
-  text: string
+  content: string
 }
 
 function renderText(text: string): ReactNode {
@@ -55,8 +55,9 @@ export function AiDiagnosis() {
     const value = text.trim()
     if (!value || busy) return
 
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', text: value }
-    setMessages((prev) => [...prev, userMsg])
+    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: value }
+    const updatedHistory = [...messages, userMsg]
+    setMessages(updatedHistory)
     setInput('')
     setBusy(true)
 
@@ -64,13 +65,16 @@ export function AiDiagnosis() {
       const res = await fetch('/api/diagnose', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: value }),
+        body: JSON.stringify({
+          message: value,
+          history: updatedHistory.slice(-6).map((m) => ({ role: m.role, content: m.content })),
+        }),
       })
 
       const data = await res.json()
 
       if (!res.ok || !data.reply) {
-        throw new Error(data.error || 'API failed')
+        throw new Error(data.error || 'Network error')
       }
 
       setMessages((prev) => [
@@ -78,23 +82,26 @@ export function AiDiagnosis() {
         {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          text: data.reply,
+          content: data.reply,
         },
       ])
     } catch {
-      // Natural conversational fallback in case of connection drop
-      const isHindi = /[\u0900-\u097F]|bhai|gadi|dhuan|kya|nahi|raha|madad/i.test(value)
-      const isGreeting = /^(hi|hello|hey|namaste|salaam)/i.test(value.trim())
+      // Dynamic conversational fallback agar internet ya API drop ho jaye
+      const isHindi = /[\u0900-\u097F]|mai|bhatak|gayi|gaya|bhai|gadi|dhuan|kya|nahi|raha|madad|sunsaan/i.test(value)
+      let customReply = ''
 
-      let fallbackText = ''
-      if (isGreeting) {
-        fallbackText = isHindi
-          ? "Namaste! Main ResQRoute Assistant hoon. Aapki gaadi me kya pareshani aa rahi hai? Mujhe batayein, main madad karta hoon."
-          : "Hello! I am your ResQRoute roadside assistant. How can I help you with your vehicle today?"
+      if (/bhatak|lost|route|rasta|sunsaan/i.test(value)) {
+        customReply = isHindi
+          ? "Ghabrayiye mat, bilkul shaant rahiye. Sabse pehle apni gaadi ke saare doors lock kar lijiye aur kisi well-lit spot (jaise petrol pump, toll plaza ya dhabe) ki taraf gaadi slow speed me badhayein. Kisi anjaan sunsaan jagah par gaadi rok kar niche mat utariye. Turant WhatsApp ya Google Maps se apni live location kisi family member ko bhej dijiye, aur zaroorat pade toh upar diye gaye Emergency 112 button par tap karein."
+          : "Stay calm and don't panic. Lock all vehicle doors immediately and keep moving slowly towards a well-lit area like a toll booth, fuel station, or highway eatery. Avoid stopping in dark or isolated spots. Share your live GPS location with a trusted contact right now, or tap the Emergency 112 button above if you feel unsafe."
+      } else if (/smoke|dhuan|heat|garam/i.test(value)) {
+        customReply = isHindi
+          ? "Gaadi ko turant left shoulder par safely rokiye aur hazard flashers on kar lijiye. Engine band karein aur kam se kam 25 minute thanda hone dein—bonnet ya radiator cap bilkul mat kholna, steam se haath jal sakta hai. Niche list me se tow truck ya mechanic ko call kar lijiye."
+          : "Pull over to the left shoulder immediately and turn on your hazards. Turn off the engine and let it cool for at least 25 minutes. Never open the radiator cap while hot. Call a tow service from the directory below."
       } else {
-        fallbackText = isHindi
-          ? "Ghabrayiye mat. Sabse pehle gaadi ko highway ke safe left side (shoulder) par rok lijiye aur hazard lights on kar lijiye. Gaadi ka bonnet abhi mat kholiye. Niche di gayi list se nearest mechanic ya towing ko turant call kar sakte hain."
-          : "Please stay safe. Gently steer your vehicle onto the road shoulder and turn on your emergency hazard flashers. Avoid opening hot components. You can instantly reach nearest emergency mechanics or towing from the directory below."
+        customReply = isHindi
+          ? "Main aapki pareshani samajh sakta hoon. Kripya thoda detail me batayein ki aapke sath abhi kya ho raha hai—kya gaadi me mechanical fault hai, ya aap kisi unsafe jagah par fas gaye hain? Main turant sahi solution batata hoon."
+          : "I understand your concern. Could you please share a bit more detail about what's happening? Let me know if it is a vehicle breakdown or a safety/navigation issue so I can guide you right away."
       }
 
       setMessages((prev) => [
@@ -102,7 +109,7 @@ export function AiDiagnosis() {
         {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          text: fallbackText,
+          content: customReply,
         },
       ])
     } finally {
@@ -118,10 +125,10 @@ export function AiDiagnosis() {
         </span>
         <div>
           <h3 className="font-display text-base font-bold leading-tight">
-            ResQRoute Emergency AI Assistant
+            ResQRoute AI Emergency Assistant
           </h3>
           <p className="text-xs text-background/70">
-            Bilingual • Real-time Safety &amp; Breakdown Guidance
+            Real-time Conversational Roadside &amp; Highway Support
           </p>
         </div>
       </div>
@@ -135,14 +142,14 @@ export function AiDiagnosis() {
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
             <ShieldAlert className="size-8 text-primary" aria-hidden />
             <p className="max-w-xs text-sm text-muted-foreground text-balance">
-              Gaadi me kya pareshani hai? Hindi ya English kisi me bhi puchiye:
+              Kuch bhi pareshani ho, seedhe batayein. Hindi ya English me baat karein:
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex}
                   onClick={() => submit(ex)}
-                  className="rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                  className="rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground transition-colors hover:border-primary/40 hover:text-primary text-left"
                 >
                   {ex}
                 </button>
@@ -163,7 +170,7 @@ export function AiDiagnosis() {
                   : 'max-w-[92%] rounded-2xl rounded-bl-sm bg-secondary px-4 py-3 text-secondary-foreground'
               }
             >
-              {renderText(m.text)}
+              {renderText(m.content)}
             </div>
           </div>
         ))}
@@ -171,7 +178,7 @@ export function AiDiagnosis() {
         {busy && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            AI diagnosing your situation…
+            ResQRoute AI is typing…
           </div>
         )}
       </div>
@@ -193,7 +200,7 @@ export function AiDiagnosis() {
             }
           }}
           rows={1}
-          placeholder="Hindi ya English me apni pareshani batayein..."
+          placeholder="Hindi ya English me type karein (e.g. Mai rasta bhatak gayi hu...)"
           className="max-h-32 min-h-11 flex-1 resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
         />
         <Button
