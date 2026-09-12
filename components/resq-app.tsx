@@ -9,6 +9,7 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { SosButton } from '@/components/sos-button'
 import { RescueMap } from '@/components/rescue-map'
 import { ServiceDirectory } from '@/components/service-directory'
 import { DEFAULT_CENTER, type ServiceCategory } from '@/lib/shops'
@@ -80,6 +81,8 @@ export function ResqApp() {
                 ? 'Update My GPS Location'
                 : 'Fetch My Live GPS Location'}
             </Button>
+
+            <SosButton size="lg" />
 
             <div className="text-sm">
               {locState === 'granted' && coords && (

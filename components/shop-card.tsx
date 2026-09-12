@@ -1,5 +1,5 @@
 import { Phone, Star, MapPin, Clock, MessageCircle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { distanceKm, type Shop } from '@/lib/shops'
 
@@ -73,29 +73,28 @@ export function ShopCard({ shop }: { shop: Shop }) {
       </div>
 
       <div className="mt-auto grid grid-cols-2 gap-2 pt-1">
-        <Button
-          render={<a href={`tel:${shop.phone}`} />}
-          nativeButton={false}
-          className="h-11 gap-2 text-sm font-semibold"
+        <a
+          href={`tel:${shop.phone}`}
+          className={cn(
+            buttonVariants({ variant: 'default' }),
+            'h-11 gap-2 text-sm font-semibold',
+          )}
         >
           <Phone className="size-4" aria-hidden />
           Call Now
-        </Button>
-        <Button
-          variant="outline"
-          nativeButton={false}
-          render={
-            <a
-              href={`https://wa.me/${shop.whatsapp}?text=${waText}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            />
-          }
-          className="h-11 gap-2 border-primary/30 text-sm font-semibold text-primary hover:bg-primary/5"
+        </a>
+        <a
+          href={`https://wa.me/${shop.whatsapp}?text=${waText}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(
+            buttonVariants({ variant: 'outline' }),
+            'h-11 gap-2 border-primary/30 text-sm font-semibold text-primary hover:bg-primary/5',
+          )}
         >
           <MessageCircle className="size-4" aria-hidden />
           WhatsApp
-        </Button>
+        </a>
       </div>
     </article>
   )
