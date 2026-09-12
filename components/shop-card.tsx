@@ -1,10 +1,21 @@
-import { Phone, Star, MapPin, Clock, MessageCircle } from 'lucide-react'
+import {
+  Phone,
+  Star,
+  MapPin,
+  Clock,
+  MessageCircle,
+  BadgeCheck,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { distanceKm, type Shop } from '@/lib/shops'
 
+/** Workshops at or above this rating are shown as verified partners. */
+const VERIFIED_RATING_THRESHOLD = 4.7
+
 export function ShopCard({ shop }: { shop: Shop }) {
   const km = distanceKm(shop.offset)
+  const isVerified = shop.rating >= VERIFIED_RATING_THRESHOLD
   const waText = encodeURIComponent(
     `Hi ${shop.name}, I have a vehicle breakdown and need emergency assistance. Can you help?`,
   )
@@ -13,9 +24,17 @@ export function ShopCard({ shop }: { shop: Shop }) {
     <article className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="font-display text-lg font-bold leading-tight text-card-foreground text-pretty">
-            {shop.name}
-          </h3>
+          <div className="flex items-start gap-1.5">
+            <h3 className="font-display text-lg font-bold leading-tight text-card-foreground text-pretty">
+              {shop.name}
+            </h3>
+            {isVerified && (
+              <BadgeCheck
+                className="mt-0.5 size-5 shrink-0 fill-accent text-accent-foreground"
+                aria-label="Verified partner workshop"
+              />
+            )}
+          </div>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <MapPin className="size-3.5 text-primary" aria-hidden />
