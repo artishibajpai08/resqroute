@@ -155,6 +155,28 @@
   }
 }
 
+@keyframes sos-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--destructive) 60%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 14px color-mix(in oklab, var(--destructive) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--destructive) 0%, transparent);
+  }
+}
+
+.animate-sos-pulse {
+  animation: sos-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-sos-pulse {
+    animation: none;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
