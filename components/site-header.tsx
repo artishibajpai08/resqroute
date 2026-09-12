@@ -25,13 +25,13 @@ export function SiteHeader() {
           </a>
         </nav>
         <Button
-          render={<a href="tel:911" />}
+          render={<a href="tel:112" />}
           nativeButton={false}
           variant="destructive"
           className="h-9 gap-2 font-semibold"
         >
           <PhoneCall className="size-4" aria-hidden />
-          Emergency 911
+          Emergency 112
         </Button>
       </div>
     </header>

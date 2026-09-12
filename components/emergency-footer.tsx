@@ -1,10 +1,10 @@
 import { Navigation, Phone } from 'lucide-react'
 
 const HELPLINES = [
-  { label: 'Police / Fire / Medical', number: '911', note: 'Life-threatening emergencies' },
-  { label: 'Highway Patrol', number: '1-800-525-5555', note: 'Accidents & road hazards' },
-  { label: 'National Roadside Assist', number: '1-800-222-4357', note: '24/7 breakdown line' },
-  { label: 'Poison / Hazmat Spill', number: '1-800-424-8802', note: 'Chemical & fuel spills' },
+  { label: 'National Emergency', number: '112', dial: '112', note: 'Single number for all emergencies' },
+  { label: 'Police', number: '100', dial: '100', note: 'Police control room' },
+  { label: 'Ambulance', number: '108 / 102', dial: '108', note: 'Medical emergency & ambulance' },
+  { label: 'National Highway Helpline (NHAI)', number: '1033', dial: '1033', note: 'Accidents & road hazards' },
 ]
 
 export function EmergencyFooter() {
@@ -24,7 +24,7 @@ export function EmergencyFooter() {
           {HELPLINES.map((h) => (
             <a
               key={h.number}
-              href={`tel:${h.number.replace(/[^0-9+]/g, '')}`}
+              href={`tel:${h.dial}`}
               className="group flex flex-col gap-1 rounded-xl border border-background/15 bg-background/5 p-4 transition-colors hover:border-accent/60 hover:bg-background/10"
             >
               <span className="text-xs font-medium text-background/60">
