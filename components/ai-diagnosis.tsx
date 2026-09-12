@@ -5,10 +5,10 @@ import { Sparkles, Send, ShieldAlert, LoaderCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const EXAMPLES = [
-  'White smoke from the engine and it overheated',
-  'Car stalled and won’t start, dashboard lights flicker',
-  'Loud grinding noise when I brake',
-  'Flat tyre on the highway shoulder',
+  'Engine se white smoke nikal raha hai aur car overheat ho gayi',
+  'Gadi start nahi ho rahi, dashboard lights flicker kar rahi hain',
+  'Brake lagane par bahut tez grinding aawaz aa rahi hai',
+  'Highway par tyre puncture / flat ho gaya hai',
 ]
 
 interface Message {
@@ -20,67 +20,43 @@ interface Message {
 function getLocalEmergencyTriage(problem: string): string {
   const q = problem.toLowerCase()
 
-  if (q.includes('heat') || q.includes('smoke') || q.includes('coolant') || q.includes('radiator')) {
-    return `**🛡️ Immediate Safety Step:**
-- Do not panic. Gently pull over to the highway shoulder away from traffic.
-- Turn on hazard lights immediately.
-- **CRITICAL WARNING:** NEVER open the radiator cap while the engine is hot—it can cause severe steam burns.
+  if (q.includes('heat') || q.includes('smoke') || q.includes('dhua') || q.includes('coolant') || q.includes('radiator')) {
+    return `Pareshan mat hoiye, sab theek ho jayega. Bas sabse pehle gaadi ko highway ke left side (shoulder lane) par safely slow karke park kar lijiye aur hazard lights (4 indicators) turant on kar dein.
 
-**🔍 Probable Diagnosis:**
-- Coolant leak, failed radiator cooling fan, or blown head gasket causing severe thermal rise.
+**Galti se bhi abhi bonnet ya radiator cap mat kholna**—andar ka coolant bohot garam aur pressurized hota hai, jisse steam se haath jalne ka khatra rehta hai. 
 
-**🛠️ Recommended Next Action:**
-- Turn off the engine and let it cool down for 25–30 minutes.
-- Select **Flatbed Towing** or an **Express Mechanic** from the directory below to avoid permanent engine seizure.`
+Gaadi ka engine band karke kam se kam 25-30 minute thanda hone dein. Zyada chances hain ki radiator fan ruk gaya hai ya coolant leak hua hai. Is halat me car chalana engine seize kar sakta hai, isliye niche di gayi list me se **Flatbed Towing** ya **Mobile Mechanic** ko request bhej dijiye.`
   }
 
-  if (q.includes('brake') || q.includes('grinding') || q.includes('pedal')) {
-    return `**🛡️ Immediate Safety Step:**
-- Avoid sudden aggressive stomping on the pedal.
-- Shift down to lower gears for engine braking and safely move to the shoulder lane.
-- Turn on your hazard flashers once parked safely.
+  if (q.includes('brake') || q.includes('grinding') || q.includes('pedal') || q.includes('awaz') || q.includes('noise')) {
+    return `Pehle relax ho jaiye aur speed dheere kijiye. Achanak zordar brake mat dabaiye, dheere-dheere engine braking (lower gear) use karke gaadi ko roadside safe jagah par rok lijiye.
 
-**🔍 Probable Diagnosis:**
-- Severely worn brake pads grinding directly onto the rotor, or hydraulic brake fluid loss.
+Aisi grinding aawaz tab aati hai jab brake pads poori tarah ghis jaate hain aur metal-to-metal contact hone lagta hai. Is halat me tez raftaar par gaadi chalana bilkul safe nahi hai.
 
-**🛠️ Recommended Next Action:**
-- **DO NOT continue driving at high highway speeds.**
-- Connect with the nearest verified roadside brake specialist listed below immediately.`
+Car ko safe side khadi karein aur niche directory me se kisi **Brake Specialist / Mechanic** ko call karke check karwa lijiye tabhi aage badhein.`
   }
 
-  if (q.includes('stall') || q.includes('start') || q.includes('battery') || q.includes('flicker') || q.includes('dead')) {
-    return `**🛡️ Immediate Safety Step:**
-- If stalled on the road, immediately switch on hazard lights so oncoming vehicles spot you.
-- If it is dark, stay safely inside the locked cabin while contacting roadside help.
+  if (q.includes('stall') || q.includes('start') || q.includes('battery') || q.includes('flicker') || q.includes('band') || q.includes('dead')) {
+    return `Ghabrayiye mat! Agar gaadi beech sadak par band ho gayi hai, toh turant hazard light on kijiye taaki peeche se aane wale traffic ko pata chale. Agar raat ka samay hai, toh gaadi ke andar hi lock hokar rahiye.
 
-**🔍 Probable Diagnosis:**
-- Discharged battery, loose terminal connection, or failed alternator unable to supply current.
+Dashboard lights flicker hona aur engine ka crank na hona aamtaur par **battery discharge** ya terminal ke loose hone ki nishani hai. 
 
-**🛠️ Recommended Next Action:**
-- Call a nearby mobile mechanic from the directory for jump-start assistance or alternator testing.`
+Aapko bas ek quick jump-start ya battery check ki zaroorat hai. Niche diye gaye directory se **Mobile Mechanic** ko connect karein, wo jump cables ke sath jaldi pahuch jayenge.`
   }
 
-  if (q.includes('tyre') || q.includes('tire') || q.includes('puncture') || q.includes('flat')) {
-    return `**🛡️ Immediate Safety Step:**
-- Keep firm control of the steering wheel and roll gradually to a level, flat surface on the shoulder.
-- Engage the handbrake completely. Never change a tyre on the traffic-facing side without clear hazard alerts.
+  if (q.includes('tyre') || q.includes('tire') || q.includes('puncture') || q.includes('flat') || q.includes('hawa')) {
+    return `Sabse pehle steering wheel par pakad majboot rakhein aur achanak se hard brake na maarein. Gaadi ko dheere-dheere kisi flat aur safe shoulder lane par le jaakar rokein.
 
-**🔍 Probable Diagnosis:**
-- Puncture from road debris, tyre bead leak, or sidewall blowout.
+Handbrake poori tarah kheench lijiye. Agar traffic side wala tyre flat hai, toh sadak par khade hokar khud change karne ka risk mat lijiye.
 
-**🛠️ Recommended Next Action:**
-- Request a mobile puncture repair van or roadside assistance partner from the directory below.`
+Niche emergency directory me se **Mobile Puncture Van / Mechanic** ko contact karein, wo proper safety reflectors aur jack ke sath aakar 10 minute me fix kar denge.`
   }
 
-  return `**🛡️ Immediate Safety Step:**
-- Take a deep breath—you are safe. Switch on your emergency hazard indicators.
-- Park the car securely on the side shoulder and engage the emergency parking brake.
+  return `Pehle relax ho jaiye, aap bilkul safe hain. Agar aap highway par hain, toh hazard lights on karke gaadi ko safe left side shoulder par laga lijiye aur handbrake kheench lijiye.
 
-**🔍 Probable Diagnosis:**
-- Mechanical or electrical abnormality detected. Driving further without initial inspection is not advised.
+Gaadi me jo issue lag raha hai, uske sath bina check karwaye aage lambi journey continue karna theek nahi hoga. 
 
-**🛠️ Recommended Next Action:**
-- Call national highway support (**1033**) or choose a verified mechanic from the directory below.`
+Agar urgent help chahiye toh highway helpline **1033** dial kar sakte hain, ya phir niche di gayi list me se nearest verified mechanic ko direct call mila lijiye.`
 }
 
 function renderText(text: string): ReactNode {
@@ -99,23 +75,6 @@ function renderText(text: string): ReactNode {
         ),
       )
 
-    if (/^\*\*.+\*\*:?$/.test(trimmed)) {
-      return (
-        <p key={i} className="mt-3 font-display text-sm font-bold text-primary">
-          {trimmed.replace(/\*\*/g, '').replace(/:$/, '')}
-        </p>
-      )
-    }
-    if (/^[-•]\s/.test(trimmed)) {
-      return (
-        <p key={i} className="flex gap-2 pl-1 text-sm leading-relaxed">
-          <span className="text-primary" aria-hidden>
-            •
-          </span>
-          <span>{inline(trimmed.replace(/^[-•]\s/, ''))}</span>
-        </p>
-      )
-    }
     return (
       <p key={i} className="text-sm leading-relaxed">
         {inline(trimmed)}
@@ -167,7 +126,7 @@ export function AiDiagnosis() {
           text: getLocalEmergencyTriage(value),
         }
         setMessages((prev) => [...prev, fallbackMsg])
-      }, 400)
+      }, 350)
     } finally {
       setBusy(false)
     }
@@ -181,10 +140,10 @@ export function AiDiagnosis() {
         </span>
         <div>
           <h3 className="font-display text-base font-bold leading-tight">
-            AI Diagnosis Assistant
+            ResQRoute Emergency AI Assistant
           </h3>
           <p className="text-xs text-background/70">
-            Describe the problem — get instant safety steps &amp; likely fixes
+            Hindi &amp; English • Real-time Safety &amp; Breakdown Guidance
           </p>
         </div>
       </div>
@@ -198,8 +157,7 @@ export function AiDiagnosis() {
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
             <ShieldAlert className="size-8 text-primary" aria-hidden />
             <p className="max-w-xs text-sm text-muted-foreground text-balance">
-              Tell me what&apos;s happening with your vehicle. Try one of these
-              to start:
+              Gaadi me kya pareshani aa rahi hai? Aap Hindi ya English kisi me bhi bata sakte hain:
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {EXAMPLES.map((ex) => (
@@ -235,7 +193,7 @@ export function AiDiagnosis() {
         {busy && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            Analyzing your emergency situation…
+            Analyzing your situation…
           </div>
         )}
       </div>
@@ -257,7 +215,7 @@ export function AiDiagnosis() {
             }
           }}
           rows={1}
-          placeholder="e.g. White smoke from engine, tyre burst, brake failing…"
+          placeholder="Apni pareshani likhein (e.g. Engine garam ho raha hai, brake se aawaz aa rahi hai...)"
           className="max-h-32 min-h-11 flex-1 resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
         />
         <Button
