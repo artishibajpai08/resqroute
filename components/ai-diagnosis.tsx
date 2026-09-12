@@ -5,58 +5,16 @@ import { Sparkles, Send, ShieldAlert, LoaderCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const EXAMPLES = [
-  'Engine se white smoke nikal raha hai aur car overheat ho gayi',
-  'Gadi start nahi ho rahi, dashboard lights flicker kar rahi hain',
-  'Brake lagane par bahut tez grinding aawaz aa rahi hai',
-  'Highway par tyre puncture / flat ho gaya hai',
+  'Engine se achanak dhuan nikal raha hai aur car ruk gayi',
+  'Dashboard lights flicker kar rahi hain aur gaadi start nahi ho rahi',
+  'Car ke brakes lagane par loud grinding awaz aa rahi hai',
+  'Tyre flat ho gaya highway par, safe kaise rahu?',
 ]
 
 interface Message {
   id: string
   role: 'user' | 'assistant'
   text: string
-}
-
-function getLocalEmergencyTriage(problem: string): string {
-  const q = problem.toLowerCase()
-
-  if (q.includes('heat') || q.includes('smoke') || q.includes('dhua') || q.includes('coolant') || q.includes('radiator')) {
-    return `Pareshan mat hoiye, sab theek ho jayega. Bas sabse pehle gaadi ko highway ke left side (shoulder lane) par safely slow karke park kar lijiye aur hazard lights (4 indicators) turant on kar dein.
-
-**Galti se bhi abhi bonnet ya radiator cap mat kholna**—andar ka coolant bohot garam aur pressurized hota hai, jisse steam se haath jalne ka khatra rehta hai. 
-
-Gaadi ka engine band karke kam se kam 25-30 minute thanda hone dein. Zyada chances hain ki radiator fan ruk gaya hai ya coolant leak hua hai. Is halat me car chalana engine seize kar sakta hai, isliye niche di gayi list me se **Flatbed Towing** ya **Mobile Mechanic** ko request bhej dijiye.`
-  }
-
-  if (q.includes('brake') || q.includes('grinding') || q.includes('pedal') || q.includes('awaz') || q.includes('noise')) {
-    return `Pehle relax ho jaiye aur speed dheere kijiye. Achanak zordar brake mat dabaiye, dheere-dheere engine braking (lower gear) use karke gaadi ko roadside safe jagah par rok lijiye.
-
-Aisi grinding aawaz tab aati hai jab brake pads poori tarah ghis jaate hain aur metal-to-metal contact hone lagta hai. Is halat me tez raftaar par gaadi chalana bilkul safe nahi hai.
-
-Car ko safe side khadi karein aur niche directory me se kisi **Brake Specialist / Mechanic** ko call karke check karwa lijiye tabhi aage badhein.`
-  }
-
-  if (q.includes('stall') || q.includes('start') || q.includes('battery') || q.includes('flicker') || q.includes('band') || q.includes('dead')) {
-    return `Ghabrayiye mat! Agar gaadi beech sadak par band ho gayi hai, toh turant hazard light on kijiye taaki peeche se aane wale traffic ko pata chale. Agar raat ka samay hai, toh gaadi ke andar hi lock hokar rahiye.
-
-Dashboard lights flicker hona aur engine ka crank na hona aamtaur par **battery discharge** ya terminal ke loose hone ki nishani hai. 
-
-Aapko bas ek quick jump-start ya battery check ki zaroorat hai. Niche diye gaye directory se **Mobile Mechanic** ko connect karein, wo jump cables ke sath jaldi pahuch jayenge.`
-  }
-
-  if (q.includes('tyre') || q.includes('tire') || q.includes('puncture') || q.includes('flat') || q.includes('hawa')) {
-    return `Sabse pehle steering wheel par pakad majboot rakhein aur achanak se hard brake na maarein. Gaadi ko dheere-dheere kisi flat aur safe shoulder lane par le jaakar rokein.
-
-Handbrake poori tarah kheench lijiye. Agar traffic side wala tyre flat hai, toh sadak par khade hokar khud change karne ka risk mat lijiye.
-
-Niche emergency directory me se **Mobile Puncture Van / Mechanic** ko contact karein, wo proper safety reflectors aur jack ke sath aakar 10 minute me fix kar denge.`
-  }
-
-  return `Pehle relax ho jaiye, aap bilkul safe hain. Agar aap highway par hain, toh hazard lights on karke gaadi ko safe left side shoulder par laga lijiye aur handbrake kheench lijiye.
-
-Gaadi me jo issue lag raha hai, uske sath bina check karwaye aage lambi journey continue karna theek nahi hoga. 
-
-Agar urgent help chahiye toh highway helpline **1033** dial kar sakte hain, ya phir niche di gayi list me se nearest verified mechanic ko direct call mila lijiye.`
 }
 
 function renderText(text: string): ReactNode {
@@ -109,24 +67,35 @@ export function AiDiagnosis() {
         body: JSON.stringify({ message: value }),
       })
 
-      if (!res.ok) throw new Error('API offline')
       const data = await res.json()
+      const replyContent = data.reply || (typeof data === 'string' ? data : null)
 
-      const assistantMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        text: data.reply || getLocalEmergencyTriage(value),
+      if (!res.ok || !replyContent) {
+        throw new Error(data.error || 'Server error')
       }
-      setMessages((prev) => [...prev, assistantMsg])
-    } catch {
-      setTimeout(() => {
-        const fallbackMsg: Message = {
+
+      setMessages((prev) => [
+        ...prev,
+        {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          text: getLocalEmergencyTriage(value),
-        }
-        setMessages((prev) => [...prev, fallbackMsg])
-      }, 350)
+          text: replyContent,
+        },
+      ])
+    } catch {
+      // Natural human-like triage fallback
+      const fallbackText = value.match(/[a-zA-Z]/) && !value.toLowerCase().includes('bhai') && !value.toLowerCase().includes('gadi')
+        ? "Please remain calm. Immediately pull over to the safety lane or shoulder, turn on your emergency hazard lights, and stay away from oncoming traffic. Do not attempt to force-drive the vehicle. You can request instant mechanical dispatch or towing from the emergency options below."
+        : "Pareshan mat hoiye, sab theek ho jayega. Sabse pehle gaadi ko highway ke safe left shoulder par laga lijiye aur hazard lights (charo indicators) on kar lijiye. Gadi se bahar nikal kar traffic se safe distance banaye rakhein. Niche diye gaye directory se turant mechanic ya tow service ko call kar sakte hain.";
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          text: fallbackText,
+        },
+      ])
     } finally {
       setBusy(false)
     }
@@ -140,10 +109,10 @@ export function AiDiagnosis() {
         </span>
         <div>
           <h3 className="font-display text-base font-bold leading-tight">
-            ResQRoute Emergency AI Assistant
+            ResQRoute AI Emergency Assistant
           </h3>
           <p className="text-xs text-background/70">
-            Hindi &amp; English • Real-time Safety &amp; Breakdown Guidance
+            Bilingual • Real-time Safety &amp; Breakdown Guidance
           </p>
         </div>
       </div>
@@ -157,7 +126,7 @@ export function AiDiagnosis() {
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
             <ShieldAlert className="size-8 text-primary" aria-hidden />
             <p className="max-w-xs text-sm text-muted-foreground text-balance">
-              Gaadi me kya pareshani aa rahi hai? Aap Hindi ya English kisi me bhi bata sakte hain:
+              Gaadi me kya issue aa raha hai? Hindi ya English kisi me bhi puchiye:
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {EXAMPLES.map((ex) => (
@@ -193,7 +162,7 @@ export function AiDiagnosis() {
         {busy && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <LoaderCircle className="size-4 animate-spin" aria-hidden />
-            Analyzing your situation…
+            AI diagnosing your situation…
           </div>
         )}
       </div>
@@ -215,7 +184,7 @@ export function AiDiagnosis() {
             }
           }}
           rows={1}
-          placeholder="Apni pareshani likhein (e.g. Engine garam ho raha hai, brake se aawaz aa rahi hai...)"
+          placeholder="Hindi ya English me apni pareshani batayein..."
           className="max-h-32 min-h-11 flex-1 resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
         />
         <Button
