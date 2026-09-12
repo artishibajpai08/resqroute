@@ -160,7 +160,6 @@ export function AiDiagnosis() {
       }
       setMessages((prev) => [...prev, assistantMsg])
     } catch {
-      // Guaranteed fallback: Never breaks, always delivers reassuring triage
       setTimeout(() => {
         const fallbackMsg: Message = {
           id: (Date.now() + 1).toString(),
