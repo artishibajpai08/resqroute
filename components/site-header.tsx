@@ -1,7 +1,5 @@
 import { Navigation, PhoneCall } from 'lucide-react'
-import { buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import { SosButton } from '@/components/sos-button'
+import { Button } from '@/components/ui/button'
 
 export function SiteHeader() {
   return (
@@ -26,19 +24,15 @@ export function SiteHeader() {
             AI Assistant
           </a>
         </nav>
-        <div className="flex items-center gap-2">
-          <SosButton />
-          <a
-            href="tel:911"
-            className={cn(
-              buttonVariants({ variant: 'outline' }),
-              'hidden h-9 gap-2 font-semibold sm:inline-flex',
-            )}
-          >
-            <PhoneCall className="size-4" aria-hidden />
-            911
-          </a>
-        </div>
+        <Button
+          render={<a href="tel:911" />}
+          nativeButton={false}
+          variant="destructive"
+          className="h-9 gap-2 font-semibold"
+        >
+          <PhoneCall className="size-4" aria-hidden />
+          Emergency 911
+        </Button>
       </div>
     </header>
   )
